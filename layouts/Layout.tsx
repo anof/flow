@@ -1,17 +1,21 @@
 import React, {FunctionComponent} from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import {Paper} from '@material-ui/core';
+import {createStyles} from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/styles';
 
-export const Layout: FunctionComponent = ({children}) => {
+const styles = () =>
+  createStyles({});
+
+export const Layout: FunctionComponent = ({children, classes}: any) => {
   return (
     <div>
-      <Header/>
-      <div>
+      <Paper className={classes.root}>
         {children}
-      </div>
-      <Footer/>
+      </Paper>
     </div>
   );
 };
 
-export default Layout;
+export default withStyles(styles)(Layout);
