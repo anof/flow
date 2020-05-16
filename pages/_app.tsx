@@ -8,8 +8,13 @@ import {WithStyles, withStyles} from '@material-ui/styles';
 const styles = () =>
   createStyles({
     root: {
-      padding: '3em 8em 0 8em', // margins to set app to middle of screen
-      backgroundColor: '#00BFFF'
+      [theme.breakpoints.up("md")]: {
+        padding: '3em 8em 0 8em', // padding to set app to middle of screen
+      },
+      [theme.breakpoints.down("md")]: {
+        padding: '1em 1em 0 1em', // padding to set app to full screen
+      },
+      backgroundColor: theme.palette.primary.main
     }
   });
 
