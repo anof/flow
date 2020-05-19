@@ -26,9 +26,12 @@ class MyDocument extends Document {
           />
           <style jsx global>
             {`
-              html,
+              html{
+              height: 100%;
+              width: 100%;
+              }
               body {
-                height: 100%;
+                min-height: 100%;
                 width: 100%;
               }
               *,

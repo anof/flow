@@ -12,7 +12,7 @@ export const theme = createMuiTheme({
       contrastText: '#FFFFFF'
     },
     background: {
-      default: '#111111'
+      default: '#CCCCCC'
     },
 
   }
