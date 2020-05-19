@@ -47,10 +47,16 @@ const styles = (theme: Theme) =>
       }
     },
     imageCard: {
+      userSelect: 'none',
       cursor: 'pointer',
       borderColor: theme.palette.success.main,
+      '&:hover': {
+        backgroundColor: theme.palette.success.main,
+        color: theme.palette.secondary.contrastText,
+      }
     },
     flowCard: {
+      userSelect: 'none',
       borderColor: theme.palette.warning.main,
       cursor: 'pointer',
       '&:hover': {
