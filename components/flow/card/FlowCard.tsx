@@ -11,11 +11,11 @@ const styles = (theme: Theme) =>
       border: '1px solid',
       minHeight: '5em',
       [theme.breakpoints.up('md')]: {
-        width: '30%'
+        width: '40%'
 
       },
       [theme.breakpoints.down('md')]: {
-        minWidth: '80%'
+        width: '90%',
       },
       backgroundColor: theme.palette.primary.light,
     },
@@ -23,6 +23,7 @@ const styles = (theme: Theme) =>
       padding: '0.3em 0.5em 0.3em 0.5em',
     },
     circle: {
+      userSelect: 'none',
       minWidth: '1.5em',
       color: theme.palette.secondary.contrastText,
       display: 'flex',
@@ -30,6 +31,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     type: {
+      userSelect: 'none',
       color: theme.palette.secondary.contrastText,
       padding: '0.2em 0.5em 0.2em 0.5em',
       borderRadius: '3px',
@@ -117,8 +119,8 @@ const FlowCard = ({classes, theme, element, mode}: any) => {
           <Grid item xs={12}>
             <Divider/>
           </Grid>
-          <Grid item xs={1}/>
-          <Grid item xs={mode === 'edit' ? 9 : 12} className={classes.content}>
+          <Grid item xs={2}/>
+          <Grid item xs={mode === 'edit' ? 8 : 12} className={classes.content}>
             {element.content}
           </Grid>
           {mode !== 'edit' ? null :
