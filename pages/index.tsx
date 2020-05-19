@@ -35,7 +35,27 @@ interface cardFields {
 }
 
 const Home = ({classes}: any) => {
-  const [list, setList] = useState([] as any);
+  const [list, setList] = useState([{
+    type: 'text',
+    content: 'content for the first step that is very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long',
+    order: 1
+  },
+    {
+      type: 'flow',
+      content: 'this is a flow',
+      order: 2
+    },
+    {
+      type: 'link',
+      content: 'http://www.google.com',
+      order: 3
+    },
+    {
+      type: 'image',
+      content: 'Image here',
+      order: 4
+    }
+    ] as any);
   const [mode, setMode] = useState('edit' as modeTypes);
 
 
@@ -72,7 +92,7 @@ const Home = ({classes}: any) => {
                   {
                     type: 'selectType',
                     content: 'Please input type',
-                    order: list.length
+                    order: list.length+1
                   }
                 ]);
               }}
