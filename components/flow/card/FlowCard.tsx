@@ -1,7 +1,8 @@
 import React, {Fragment} from 'react';
-import {Grid, Paper, Theme, withStyles} from '@material-ui/core';
+import {Grid, IconButton, Paper, Theme, withStyles} from '@material-ui/core';
 import clsx from 'clsx';
 import {createStyles} from '@material-ui/styles';
+import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -16,6 +17,8 @@ const styles = (theme: Theme) =>
         minWidth: '80%'
       },
       backgroundColor: theme.palette.primary.light,
+    },
+    content: {
       padding: '2em 0.5em 2em 0.5em',
     },
     linkCard: {
@@ -42,7 +45,7 @@ const styles = (theme: Theme) =>
   });
 
 
-const FlowCard = ({classes, element}: any) => {
+const FlowCard = ({classes, element, mode}: any) => {
   return (
     <Grid container item justify={'center'} xs={12}>
       <Paper
@@ -61,7 +64,21 @@ const FlowCard = ({classes, element}: any) => {
           )
         }
       >
-        {element.content}
+        <Grid container>
+          <Grid item xs={mode === 'edit' ? 11 : 12} className={classes.content}>
+            {element.content}
+          </Grid>
+          {mode !== 'edit' ? null :
+            <Grid
+              container item xs={1}
+              alignItems={'center'}
+              justify={'flex-end'}>
+              <IconButton>
+                <DragIndicatorIcon/>
+              </IconButton>
+            </Grid>
+          }
+        </Grid>
       </Paper>
     </Grid>
   );

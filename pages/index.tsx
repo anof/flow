@@ -34,17 +34,17 @@ interface cardFields {
   order: number
 }
 
-const Home = ({classes, theme}: any) => {
+const Home = ({classes}: any) => {
   const [list, setList] = useState([] as any);
-  const [selectedButton, setSelectedButton] = useState('edit' as modeTypes);
+  const [mode, setMode] = useState('edit' as modeTypes);
 
 
-  const renderCards = (list: [cardFields], classes: any) => {
+  const renderCards = (list: [cardFields]) => {
     return (
       list.map((el: any, i: number) => {
         return (
           <>
-            <FlowCard element={el} key={el.order}/>
+            <FlowCard element={el} key={el.order} mode={mode}/>
             {i === list.length - 1 ? null : <ExpandMoreIcon/>}
           </>
         );
@@ -53,16 +53,16 @@ const Home = ({classes, theme}: any) => {
   };
 
   const handleChangeMode = (mode: modeTypes) => {
-    setSelectedButton(mode);
+    setMode(mode);
   };
 
   return (
     <Layout>
-      <FlowHeader mode={selectedButton} handleChangeMode={handleChangeMode}/>
+      <FlowHeader mode={mode} handleChangeMode={handleChangeMode}/>
       <Grid container justify={'center'} spacing={3} className={classes.root}>
-        {renderCards(list, classes)}
+        {renderCards(list)}
         <Grid item xs={12}>
-          {selectedButton === 'preview' ? null :
+          {mode === 'preview' ? null :
             <Button
               variant={'contained'}
               color={'secondary'}
@@ -87,4 +87,4 @@ const Home = ({classes, theme}: any) => {
 };
 
 
-export default withStyles(styles, {withTheme: true})(Home);
+export default withStyles(styles)(Home);
