@@ -1,34 +1,34 @@
 {
-  "name": "boostArabia-react",
+  "name": "minorflow",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "export": "next export"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@material-ui/core": "^4.9.10",
     "@material-ui/icons": "^4.9.1",
-    "@material-ui/styles": "^4.9.10",
-    "@types/lodash": "^4.14.151",
+    "@material-ui/styles": "^4.9.14",
+    "@types/lodash": "^4.14.152",
     "clsx": "^1.1.0",
-    "commitizen": "^4.0.4",
+    "commitizen": "^4.1.2",
     "lodash": "^4.17.15",
-    "next": "^9.3.5",
+    "next": "^9.4.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
-    "@material-ui/core": "^4.9.10",
-    "@types/node": "^13.11.1",
-    "@types/react": "^16.9.34",
-    "cz-conventional-changelog": "^3.1.0",
-    "typescript": "^3.8.3"
+    "@material-ui/core": "^4.9.14",
+    "@types/node": "^13.13.9",
+    "@types/react": "^16.9.35",
+    "cz-conventional-changelog": "^3.2.0",
+    "typescript": "^3.9.3"
   },
   "config": {
     "commitizen": {
