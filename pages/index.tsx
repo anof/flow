@@ -55,7 +55,7 @@ const Home = ({classes}: any) => {
       content: 'Image here',
       order: 4
     }
-    ] as any);
+  ] as any);
   const [mode, setMode] = useState('edit' as modeTypes);
 
 
@@ -76,6 +76,20 @@ const Home = ({classes}: any) => {
     setMode(mode);
   };
 
+  /**
+   * Handles adding new card, by adding new item to list with type SelectType
+   * and letting FlowCard component handle logic
+   */
+  const handleAddNewCard = () => {
+    setList((list: [cardFields]) => [...list,
+      {
+        type: 'Select Type',
+        content: '',
+        order: list.length + 1
+      }
+    ]);
+  };
+
   return (
     <Layout>
       <FlowHeader mode={mode} handleChangeMode={handleChangeMode}/>
@@ -87,15 +101,7 @@ const Home = ({classes}: any) => {
               variant={'contained'}
               color={'secondary'}
               className={classes.addButton}
-              onClick={() => {
-                setList((list: [cardFields]) => [...list,
-                  {
-                    type: 'selectType',
-                    content: 'Please input type',
-                    order: list.length+1
-                  }
-                ]);
-              }}
+              onClick={handleAddNewCard}
             >
               <AddIcon/>
             </Button>

@@ -1,9 +1,12 @@
-import React, {Fragment} from 'react';
-import {Grid, IconButton, Paper, Theme, withStyles, Divider, Badge, Box} from '@material-ui/core';
+import React from 'react';
+import {Box, Divider, Grid, IconButton, Paper, Theme, withStyles} from '@material-ui/core';
 import clsx from 'clsx';
 import {createStyles} from '@material-ui/styles';
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import {capitalize} from 'lodash';
+import {getBackgroundColor} from '../../../styles/cardsTypesColors';
+import {cardsTypes} from '../../../utils/cards/cardsTypes';
+import {NewCardOptions} from './NewCardOptions';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -69,21 +72,7 @@ const styles = (theme: Theme) =>
   });
 
 
-const FlowCard = ({classes, theme, element, mode}: any) => {
-  const getBackgroundColor = (type: string) => {
-    switch (type) {
-      case 'link':
-        return theme.palette.info.main;
-      case 'flow':
-        return theme.palette.warning.main;
-      case 'image':
-        return theme.palette.success.main;
-      default:
-        return '#111111';
-    }
-  };
-
-
+const FlowCard = ({classes, element, mode}: any) => {
   return (
     <Grid container item justify={'center'} xs={12}>
       <Paper
@@ -121,7 +110,12 @@ const FlowCard = ({classes, theme, element, mode}: any) => {
           </Grid>
           <Grid item xs={2}/>
           <Grid item xs={mode === 'edit' ? 8 : 12} className={classes.content}>
-            {element.content}
+            {
+              element.type === cardsTypes.selectType?
+                NewCardOptions()
+                :
+              element.content
+            }
           </Grid>
           {mode !== 'edit' ? null :
             <Grid
