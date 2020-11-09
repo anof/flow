@@ -1,0 +1,28 @@
+{
+type: "text",
+content:"blabllalal",
+order: 1
+}
+
+
+{
+type: "link",
+content:"http://www.google.com",
+order: 3
+}
+
+
+
+//future
+
+{
+type: "image",
+content:"www.google.com/image",
+order: 2
+}
+
+{
+type: "flow",
+content:"/flow_id",
+order: 4
+}

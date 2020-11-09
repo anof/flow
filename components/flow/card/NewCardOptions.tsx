@@ -6,8 +6,11 @@ import _map from 'lodash/map';
 
 export const NewCardOptions = () => {
   const [typeChosen, setTypeChosen] = useState(null as any);
+  
 
   const handleSelectType = (type: string) => {
+    // TODO: Change returns, to modify the item/element type in list, so function cardFlow component can
+    // continue handling card as it is. edit mode for card does something, while preview does something else
     switch (type) {
       case cardsTypes.link:
         setTypeChosen(<div>add link here</div>);
