@@ -132,6 +132,24 @@ const Home = () => {
     });
   };
 
+  const handleCardTypeChange = (order: number, newType: string) => {
+    setList(list => list.map(item => {
+      if (item.order === order) {
+        // Reset content based on new type
+        const newContent = newType === 'link' 
+          ? { url: '', name: '' }
+          : '';
+
+        return {
+          ...item,
+          type: newType,
+          content: newContent
+        };
+      }
+      return item;
+    }));
+  };
+
   if (!isClient) {
     return null;
   }
@@ -163,6 +181,7 @@ const Home = () => {
                             dragHandleProps={provided.dragHandleProps}
                             onUpdate={(newContent) => handleCardUpdate(element.order, newContent)}
                             onDelete={() => handleDeleteCard(element.order)}
+                            onTypeChange={(newType) => handleCardTypeChange(element.order, newType)}
                           />
                           <ExpandMoreIcon sx={{ mt: 1, color: 'text.secondary' }} />
                         </Grid>
