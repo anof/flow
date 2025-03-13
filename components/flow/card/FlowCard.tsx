@@ -12,6 +12,7 @@ interface Props {
     order: number;
   };
   mode: 'edit' | 'preview';
+  dragHandleProps?: any;
 }
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -47,9 +48,11 @@ const StyledContent = styled(Box)({
 
 const StyledDragHandle = styled(Box)({
   cursor: 'move',
+  display: 'flex',
+  alignItems: 'center',
 });
 
-const FlowCard: React.FC<Props> = ({ element, mode }) => {
+const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps }) => {
   const backgroundColor = getBackgroundColor(element.type);
   
   return (
@@ -59,8 +62,8 @@ const FlowCard: React.FC<Props> = ({ element, mode }) => {
           <Grid item xs={12}>
             <StyledCardHeader>
               {mode === 'edit' && (
-                <StyledDragHandle>
-                  <IconButton size="small">
+                <StyledDragHandle {...dragHandleProps}>
+                  <IconButton size="small" sx={{ cursor: 'move' }}>
                     <DragIndicatorIcon />
                   </IconButton>
                 </StyledDragHandle>

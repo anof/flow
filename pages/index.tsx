@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../layouts/Layout';
 import { Button, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -49,6 +49,11 @@ const Home = () => {
       order: 2
     }
   ]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -76,6 +81,10 @@ const Home = () => {
     setShowOptions(false);
   };
 
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <Layout>
       <StyledRoot container>
@@ -96,8 +105,12 @@ const Home = () => {
                       isDragDisabled={mode !== 'edit'}
                     >
                       {(provided) => (
-                        <Grid item xs={12} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                          <FlowCard element={element} mode={mode} />
+                        <Grid item xs={12} ref={provided.innerRef} {...provided.draggableProps}>
+                          <FlowCard 
+                            element={element} 
+                            mode={mode} 
+                            dragHandleProps={provided.dragHandleProps}
+                          />
                           <ExpandMoreIcon sx={{ mt: 1, color: 'text.secondary' }} />
                         </Grid>
                       )}
