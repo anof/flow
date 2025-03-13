@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ImageIcon from '@mui/icons-material/Image';
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 
 interface Props {
   content: string;
@@ -41,12 +42,34 @@ const ImageCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
 
   if (mode === 'preview') {
     return (
-      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <img 
-          src={content} 
-          alt="Flow card image" 
-          style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain' }}
-        />
+      <Box 
+        sx={{ 
+          width: '100%', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 1,
+          py: 3
+        }}
+      >
+        {content ? (
+          <img 
+            src={content} 
+            alt="Flow card image" 
+            style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain' }}
+          />
+        ) : (
+          <>
+            <ImageNotSupportedIcon sx={{ fontSize: 40, color: 'text.secondary' }} />
+            <Typography variant="body1" color="text.secondary" align="center">
+              Image not uploaded yet
+            </Typography>
+            <Typography variant="body2" color="text.secondary" align="center">
+              Switch to edit mode to add an image
+            </Typography>
+          </>
+        )}
       </Box>
     );
   }
