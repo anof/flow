@@ -183,7 +183,7 @@ const Home = () => {
                             onDelete={() => handleDeleteCard(element.order)}
                             onTypeChange={(newType) => handleCardTypeChange(element.order, newType)}
                           />
-                          <ExpandMoreIcon sx={{ mt: 1, color: 'text.secondary' }} />
+                          {index < list.length - 1 && <ExpandMoreIcon sx={{ mt: 1, color: 'text.secondary' }} />}
                         </Grid>
                       )}
                     </Draggable>
