@@ -1,33 +1,41 @@
-import React, {useState} from 'react';
-import {Button, ButtonGroup} from '@material-ui/core';
-import {colorProps} from '../../../customTypes';
+import React from 'react';
+import { Button, ButtonGroup } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { modeTypes } from '../../../customTypes';
 
-const getColor = (buttonValue: string, selectedButton: string): colorProps => {
-  if (selectedButton === buttonValue)
-    return 'primary';
-  else
-    return undefined;
+interface Props {
+  mode: modeTypes;
+  setMode: (mode: modeTypes) => void;
+}
+
+const StyledButtonGroup = styled(ButtonGroup)({
+  '& .MuiButton-root': {
+    minWidth: '80px',
+    padding: '4px 12px',
+    fontSize: '0.875rem',
+  }
+});
+
+const getColor = (buttonMode: modeTypes, currentMode: modeTypes) => {
+  return buttonMode === currentMode ? 'primary' : 'inherit';
 };
 
-
-const ControlButtons = ({mode, handleChangeMode}: any) => {
+const ControlButtons: React.FC<Props> = ({ mode, setMode }) => {
   return (
-    <ButtonGroup>
+    <StyledButtonGroup variant="contained" size="small">
       <Button
-        variant={'contained'}
-        color={getColor('edit', mode)}
-        onClick={() => handleChangeMode('edit')}
-      >
-        Edit
-      </Button>
-      <Button
-        variant={'contained'}
-        onClick={() => handleChangeMode('preview')}
         color={getColor('preview', mode)}
+        onClick={() => setMode('preview')}
       >
         Preview
       </Button>
-    </ButtonGroup>
+      <Button
+        color={getColor('edit', mode)}
+        onClick={() => setMode('edit')}
+      >
+        Edit
+      </Button>
+    </StyledButtonGroup>
   );
 };
 

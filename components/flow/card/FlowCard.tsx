@@ -1,137 +1,87 @@
 import React from 'react';
-import {Box, Divider, Grid, IconButton, Paper, Theme, withStyles} from '@material-ui/core';
-import clsx from 'clsx';
-import {createStyles} from '@material-ui/styles';
-import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
-import {capitalize} from 'lodash';
-import {getBackgroundColor} from '../../../styles/cardsTypesColors';
-import {cardsTypes} from '../../../utils/cards/cardsTypes';
-import {NewCardOptions} from './NewCardOptions';
+import { Box, Divider, Grid, IconButton, Paper } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { capitalize } from 'lodash';
+import { getBackgroundColor } from '../../../styles/cardsTypesColors';
 
-const styles = (theme: Theme) =>
-  createStyles({
-    paper: {
-      border: '1px solid',
-      minHeight: '5em',
-      [theme.breakpoints.up('md')]: {
-        width: '40%'
+interface Props {
+  element: {
+    type: string;
+    content: string;
+    order: number;
+  };
+  mode: 'edit' | 'preview';
+}
 
-      },
-      [theme.breakpoints.down('md')]: {
-        width: '90%',
-      },
-      backgroundColor: theme.palette.primary.light,
-    },
-    cardHeader: {
-      padding: '0.3em 0.5em 0.3em 0.5em',
-    },
-    circle: {
-      userSelect: 'none',
-      minWidth: '1.5em',
-      color: theme.palette.secondary.contrastText,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    type: {
-      userSelect: 'none',
-      color: theme.palette.secondary.contrastText,
-      padding: '0.2em 0.5em 0.2em 0.5em',
-      borderRadius: '3px',
-    },
-    content: {
-      padding: '2em 0.5em 2em 0.5em',
-    },
-    linkCard: {
-      userSelect: 'none',
-      borderColor: theme.palette.info.main,
-      cursor: 'pointer',
-      '&:hover': {
-        backgroundColor: theme.palette.info.main,
-        color: theme.palette.secondary.contrastText,
-      }
-    },
-    imageCard: {
-      userSelect: 'none',
-      cursor: 'pointer',
-      borderColor: theme.palette.success.main,
-      '&:hover': {
-        backgroundColor: theme.palette.success.main,
-        color: theme.palette.secondary.contrastText,
-      }
-    },
-    flowCard: {
-      userSelect: 'none',
-      borderColor: theme.palette.warning.main,
-      cursor: 'pointer',
-      '&:hover': {
-        backgroundColor: theme.palette.warning.main,
-        color: theme.palette.secondary.contrastText,
-      }
-    }
-  });
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  border: '1px solid',
+  minHeight: '100px',
+  backgroundColor: '#fff',
+  [theme.breakpoints.up('md')]: {
+    width: '60%'
+  },
+  [theme.breakpoints.down('md')]: {
+    width: '90%',
+  },
+}));
 
+const StyledCardHeader = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  padding: '8px 16px',
+  justifyContent: 'space-between',
+});
 
-const FlowCard = ({classes, element, mode}: any) => {
+const StyledType = styled(Box)({
+  userSelect: 'none',
+  padding: '4px 12px',
+  borderRadius: '4px',
+  color: '#fff',
+  fontWeight: 500,
+});
+
+const StyledContent = styled(Box)({
+  padding: '16px',
+});
+
+const StyledDragHandle = styled(Box)({
+  cursor: 'move',
+});
+
+const FlowCard: React.FC<Props> = ({ element, mode }) => {
+  const backgroundColor = getBackgroundColor(element.type);
+  
   return (
-    <Grid container item justify={'center'} xs={12}>
-      <Paper
-        elevation={5}
-        className={
-          clsx(
-            classes.paper,
-            element.type === 'link' ?
-              classes.linkCard
-              :
-              element.type === 'image' ?
-                classes.imageCard
-                : element.type === 'flow' ?
-                classes.flowCard :
-                null
-          )
-        }
-      >
+    <Grid container item justifyContent="center" xs={12}>
+      <StyledPaper elevation={1} style={{ borderColor: backgroundColor }}>
         <Grid container>
-          <Grid item container xs={12} justify={'space-between'} className={classes.cardHeader}>
-            <Box
-              borderRadius="50%"
-              className={classes.circle}
-              style={{backgroundColor: getBackgroundColor(element.type)}}>
-              {element.order}
-            </Box>
-            <Box
-              className={classes.type}
-              style={{backgroundColor: getBackgroundColor(element.type)}}>
-              {capitalize(element.type)}
-            </Box>
+          <Grid item xs={12}>
+            <StyledCardHeader>
+              {mode === 'edit' && (
+                <StyledDragHandle>
+                  <IconButton size="small">
+                    <DragIndicatorIcon />
+                  </IconButton>
+                </StyledDragHandle>
+              )}
+              <StyledType style={{ backgroundColor }}>
+                {capitalize(element.type)}
+              </StyledType>
+            </StyledCardHeader>
           </Grid>
           <Grid item xs={12}>
-            <Divider/>
+            <Divider />
           </Grid>
-          <Grid item xs={2}/>
-          <Grid item xs={mode === 'edit' ? 8 : 12} className={classes.content}>
-            {
-              element.type === cardsTypes.selectType?
-                NewCardOptions()
-                :
-              element.content
-            }
+          <Grid item xs={12}>
+            <StyledContent>
+              {element.content}
+            </StyledContent>
           </Grid>
-          {mode !== 'edit' ? null :
-            <Grid
-              container item xs={2}
-              alignItems={'center'}
-              justify={'flex-end'}>
-              <IconButton>
-                <DragIndicatorIcon/>
-              </IconButton>
-            </Grid>
-          }
         </Grid>
-      </Paper>
+      </StyledPaper>
     </Grid>
   );
 };
 
-
-export default withStyles(styles, {withTheme: true})(FlowCard);
+export default FlowCard;

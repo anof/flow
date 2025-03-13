@@ -1,8 +1,8 @@
 import React from 'react';
-import ThemeProvider from '@material-ui/styles/ThemeProvider';
+import { ThemeProvider } from '@mui/material/styles';
 import theme from '../styles/theme';
 import {AppProps} from 'next/app';
-import {CssBaseline} from '@material-ui/core';
+import {CssBaseline} from '@mui/material';
 
 
 export const App = ({Component, pageProps}: AppProps) => {

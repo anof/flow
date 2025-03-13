@@ -1,22 +1,14 @@
 import React from 'react';
-import {Button as MUIButton} from '@material-ui/core';
-import {ButtonProps} from '@material-ui/core';
-import {createStyles, withStyles} from '@material-ui/styles';
+import { Button as MUIButton, ButtonProps } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const styles = () =>
-  createStyles({
-    root: {
-      padding: '0.5em 2em 0.5em 2em',
-      borderRadius: '0',
-      fontWeight: 'normal',
-    }
-  });
+const StyledButton = styled(MUIButton)(({ theme }) => ({
+  margin: theme.spacing(1),
+  padding: theme.spacing(1, 2)
+}));
 
-
-export const Button = (props: ButtonProps) => {
-  return (
-    <MUIButton {...props}/>
-  );
+const Button: React.FC<ButtonProps> = (props) => {
+  return <StyledButton {...props} />;
 };
 
-export default withStyles(styles)(Button);
+export default Button;

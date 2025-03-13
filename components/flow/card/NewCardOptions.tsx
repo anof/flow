@@ -1,51 +1,38 @@
-import {Button, Grid} from '@material-ui/core';
-import {cardsTypes} from '../../../utils/cards/cardsTypes';
-import {getBackgroundColor} from '../../../styles/cardsTypesColors';
-import React, {useState} from 'react';
-import _map from 'lodash/map';
+import React from 'react';
+import { Button, Grid } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { getBackgroundColor } from '../../../styles/cardsTypesColors';
 
-export const NewCardOptions = () => {
-  const [typeChosen, setTypeChosen] = useState(null as any);
-  
+const StyledButton = styled(Button)(({ theme }) => ({
+  minWidth: '100px',
+  margin: '4px',
+}));
 
-  const handleSelectType = (type: string) => {
-    // TODO: Change returns, to modify the item/element type in list, so function cardFlow component can
-    // continue handling card as it is. edit mode for card does something, while preview does something else
-    switch (type) {
-      case cardsTypes.link:
-        setTypeChosen(<div>add link here</div>);
-        break;
-      case cardsTypes.flow:
-        setTypeChosen(<div>add flow here</div>);
-        break;
-      case cardsTypes.image:
-        setTypeChosen(<div>add image here</div>);
-        break;
-      case cardsTypes.text:
-        setTypeChosen(<div>add text here</div>);
-        break;
-      default:
-        setTypeChosen(<div>Something went wrong!</div>);
-    }
-  };
-  return <Grid container spacing={2}>
-    {
-      typeChosen ||
-      _map(cardsTypes, (value: any, key: any) => {
-          if (value === cardsTypes.selectType)
-            return;
-          return <Grid item xs={12} sm={12} md={3}>
-            <Button
-              fullWidth
-              variant={'contained'}
-              style={{backgroundColor: getBackgroundColor(value), color: '#FFFFFF'}}
-              size={'large'}
-              onClick={() => handleSelectType(value)}
-            >
-              {value}
-            </Button>
-          </Grid>;
-        }
-      )}
-  </Grid>;
+interface Props {
+  onSelect: (type: string) => void;
+}
+
+const cardTypes = ['text', 'link', 'image', 'flow'];
+
+export const NewCardOptions: React.FC<Props> = ({ onSelect }) => {
+  return (
+    <Grid container justifyContent="center" spacing={1}>
+      {cardTypes.map((type) => (
+        <Grid item key={type}>
+          <StyledButton
+            variant="contained"
+            onClick={() => onSelect(type)}
+            style={{
+              backgroundColor: getBackgroundColor(type),
+              color: '#fff'
+            }}
+          >
+            {type}
+          </StyledButton>
+        </Grid>
+      ))}
+    </Grid>
+  );
 };
+
+export default NewCardOptions;

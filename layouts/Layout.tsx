@@ -1,28 +1,20 @@
-import React, {FunctionComponent} from 'react';
-import {createStyles} from '@material-ui/core/styles';
-import {withStyles} from '@material-ui/styles';
-import theme from '../styles/theme';
+import React from 'react';
+import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
+import Header from '../components/layout/Header';
 
-const styles = () =>
-  createStyles({
-    root: {
-      [theme.breakpoints.up('md')]: {
-        padding: '3em 8em 0 8em', // padding to set app to middle of screen
-      },
-      [theme.breakpoints.down('md')]: {
-        padding: '1em 1em 0 1em', // padding to set app to full screen
-      },
-    }
-  });
+const StyledLayout = styled(Box)(({ theme }) => ({
+  minHeight: '100vh',
+  backgroundColor: theme.palette.background.default
+}));
 
-export const Layout: FunctionComponent = ({children, classes}: any) => {
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div>
-      <div className={classes.root}>
-        {children}
-      </div>
-    </div>
+    <StyledLayout>
+      <Header />
+      {children}
+    </StyledLayout>
   );
 };
 
-export default withStyles(styles)(Layout);
+export default Layout;

@@ -1,73 +1,63 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Layout from '../layouts/Layout';
-import {Button, Grid, Theme} from '@material-ui/core';
-import {createStyles} from '@material-ui/core/styles';
-import {withStyles} from '@material-ui/styles';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import AddIcon from '@material-ui/icons/Add';
-import FlowHeader from '../components/flow/header/FlowHeader';
+import { Button, Grid } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FlowCard from '../components/flow/card/FlowCard';
-import {modeTypes} from '../customTypes';
+import NewCardOptions from '../components/flow/card/NewCardOptions';
+import ControlButtons from '../components/flow/header/ControlButtons';
+import { modeTypes } from '../customTypes';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-const styles = (theme: Theme) =>
-  createStyles({
-    root: {
-      textAlign: 'center',
-      paddingBottom: '1em'
-    },
-    addButton: {
-      [theme.breakpoints.up('md')]: {
-        width: '10%',
+const StyledRoot = styled(Grid)(({ theme }) => ({
+  textAlign: 'center',
+  paddingTop: '2em',
+  paddingBottom: '5em',
+  position: 'relative',
+}));
 
-      },
-      [theme.breakpoints.down('md')]: {
-        width: '50%'
-      },
-      marginTop: '2em',
-
-    },
-  });
-
-interface cardFields {
-  type: string,
-  content: string,
-  order: number
-}
-
-const Home = ({classes}: any) => {
-  const [list, setList] = useState([{
-    type: 'text',
-    content: 'content for the first step that is very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long',
-    order: 1
+const StyledAddButton = styled(Button)(({ theme }) => ({
+  marginTop: '1em',
+  [theme.breakpoints.up('md')]: {
+    width: '10%',
   },
-    {
-      type: 'flow',
-      content: 'this is a flow',
-      order: 2
-    },
+  [theme.breakpoints.down('md')]: {
+    width: '50%'
+  }
+}));
+
+const StyledOptionsContainer = styled(Grid)({
+  position: 'absolute',
+  bottom: '2em',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  width: '100%',
+});
+
+const Home = () => {
+  const [mode, setMode] = useState<modeTypes>('edit');
+  const [showOptions, setShowOptions] = useState(false);
+  const [list, setList] = useState([
     {
       type: 'link',
-      content: 'http://www.google.com',
-      order: 3
+      content: 'First card',
+      order: 1
     },
     {
       type: 'image',
-      content: 'Image here',
-      order: 4
+      content: 'Second card',
+      order: 2
     }
-  ] as any);
-  const [mode, setMode] = useState('edit' as modeTypes);
+  ]);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
-    const items = Array.from(list) as cardFields[];
+    const items = Array.from(list);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    // Update order numbers
-    const updatedItems = items.map((item: cardFields, index) => ({
+    const updatedItems = items.map((item, index) => ({
       ...item,
       order: index + 1
     }));
@@ -75,87 +65,70 @@ const Home = ({classes}: any) => {
     setList(updatedItems);
   };
 
-  const renderCards = (list: [cardFields]) => {
-    return (
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="cards">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-            >
-              {list.map((el: any, i: number) => (
-                <Draggable
-                  key={el.order}
-                  draggableId={el.order.toString()}
-                  index={i}
-                  isDragDisabled={mode !== 'edit'}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={{
-                        ...provided.draggableProps.style,
-                        width: '100%',
-                        marginBottom: '1em'
-                      }}
-                    >
-                      <FlowCard element={el} mode={mode} />
-                      {i === list.length - 1 ? null : <ExpandMoreIcon />}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-    );
-  };
-
-  const handleChangeMode = (mode: modeTypes) => {
-    setMode(mode);
-  };
-
-  /**
-   * Handles adding new card, by adding new item to list with type SelectType
-   * and letting FlowCard component handle logic
-   */
-  const handleAddNewCard = () => {
-    setList((list: [cardFields]) => [...list,
+  const handleAddNewCard = (type: string) => {
+    setList(list => [...list,
       {
-        type: 'Select Type',
+        type,
         content: '',
         order: list.length + 1
       }
     ]);
+    setShowOptions(false);
   };
 
   return (
     <Layout>
-      <FlowHeader mode={mode} handleChangeMode={handleChangeMode}/>
-      <Grid container justify={'center'} spacing={3} className={classes.root}>
-        {renderCards(list)}
-        <Grid item xs={12}>
-          {mode === 'preview' ? null :
-            <Button
-              variant={'contained'}
-              color={'secondary'}
-              className={classes.addButton}
-              onClick={handleAddNewCard}
-            >
-              <AddIcon/>
-            </Button>
-          }
+      <StyledRoot container>
+        <Grid container justifyContent="flex-end" sx={{ mb: 2, pr: 2 }}>
+          <ControlButtons mode={mode} setMode={setMode} />
         </Grid>
-      </Grid>
+
+        <Grid container spacing={1}>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="droppable">
+              {(provided) => (
+                <Grid container spacing={1} {...provided.droppableProps} ref={provided.innerRef}>
+                  {list.map((element, index) => (
+                    <Draggable
+                      key={element.order}
+                      draggableId={element.order.toString()}
+                      index={index}
+                      isDragDisabled={mode !== 'edit'}
+                    >
+                      {(provided) => (
+                        <Grid item xs={12} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                          <FlowCard element={element} mode={mode} />
+                          <ExpandMoreIcon sx={{ mt: 1, color: 'text.secondary' }} />
+                        </Grid>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </Grid>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </Grid>
+
+        {mode === 'edit' && (
+          <StyledOptionsContainer>
+            {showOptions ? (
+              <NewCardOptions onSelect={handleAddNewCard} />
+            ) : (
+              <StyledAddButton
+                variant="contained"
+                color="primary"
+                onClick={() => setShowOptions(true)}
+                endIcon={<ExpandMoreIcon />}
+              >
+                Add card
+              </StyledAddButton>
+            )}
+          </StyledOptionsContainer>
+        )}
+      </StyledRoot>
     </Layout>
   );
 };
 
-
-export default withStyles(styles)(Home);
+export default Home;

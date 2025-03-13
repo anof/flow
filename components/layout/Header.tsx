@@ -1,16 +1,21 @@
-import React, {FunctionComponent} from 'react';
-import {createStyles, withStyles} from '@material-ui/core/styles';
+import React from 'react';
+import { styled } from '@mui/material/styles';
+import { AppBar, Toolbar, Typography } from '@mui/material';
 
-const styles = () =>
-  createStyles({});
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main
+}));
 
-export const Header: FunctionComponent = (props: any) => {
-  const {classes} = props;
+const Header = () => {
   return (
-    <div>
-      Header
-    </div>
+    <StyledAppBar position="static">
+      <Toolbar>
+        <Typography variant="h6">
+          Flow
+        </Typography>
+      </Toolbar>
+    </StyledAppBar>
   );
 };
 
-export default withStyles(styles)(Header);
+export default Header;
