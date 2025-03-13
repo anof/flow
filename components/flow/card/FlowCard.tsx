@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Divider, Grid, IconButton, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { capitalize } from 'lodash';
 import { getBackgroundColor } from '../../../styles/cardsTypesColors';
 import ImageCard from './types/ImageCard';
@@ -18,6 +19,7 @@ interface Props {
   mode: 'edit' | 'preview';
   dragHandleProps?: any;
   onUpdate?: (content: any) => void;
+  onDelete?: () => void;
 }
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -39,6 +41,20 @@ const StyledCardHeader = styled(Box)({
   justifyContent: 'space-between',
 });
 
+const StyledHeaderLeft = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+});
+
+const StyledCardNumber = styled(Box)({
+  userSelect: 'none',
+  padding: '4px 8px',
+  borderRadius: '4px',
+  backgroundColor: '#f5f5f5',
+  fontWeight: 500,
+});
+
 const StyledType = styled(Box)({
   userSelect: 'none',
   padding: '4px 12px',
@@ -57,7 +73,7 @@ const StyledDragHandle = styled(Box)({
   alignItems: 'center',
 });
 
-const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps, onUpdate }) => {
+const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps, onUpdate, onDelete }) => {
   const backgroundColor = getBackgroundColor(element.type);
   
   const renderCardContent = () => {
@@ -105,16 +121,28 @@ const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps, onUpdate })
         <Grid container>
           <Grid item xs={12}>
             <StyledCardHeader>
-              {mode === 'edit' && (
-                <StyledDragHandle {...dragHandleProps}>
-                  <IconButton size="small" sx={{ cursor: 'move' }}>
-                    <DragIndicatorIcon />
-                  </IconButton>
-                </StyledDragHandle>
+              <StyledHeaderLeft>
+                {mode === 'edit' && (
+                  <StyledDragHandle {...dragHandleProps}>
+                    <IconButton size="small" sx={{ cursor: 'move' }}>
+                      <DragIndicatorIcon />
+                    </IconButton>
+                  </StyledDragHandle>
+                )}
+                <StyledCardNumber>#{element.order}</StyledCardNumber>
+                <StyledType style={{ backgroundColor }}>
+                  {capitalize(element.type)}
+                </StyledType>
+              </StyledHeaderLeft>
+              {mode === 'edit' && onDelete && (
+                <IconButton 
+                  size="small" 
+                  onClick={onDelete}
+                  sx={{ color: 'error.main' }}
+                >
+                  <DeleteIcon />
+                </IconButton>
               )}
-              <StyledType style={{ backgroundColor }}>
-                {capitalize(element.type)}
-              </StyledType>
             </StyledCardHeader>
           </Grid>
           <Grid item xs={12}>

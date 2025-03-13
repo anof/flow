@@ -122,6 +122,16 @@ const Home = () => {
     ));
   };
 
+  const handleDeleteCard = (order: number) => {
+    setList(list => {
+      const filteredList = list.filter(item => item.order !== order);
+      return filteredList.map((item, index) => ({
+        ...item,
+        order: index + 1
+      }));
+    });
+  };
+
   if (!isClient) {
     return null;
   }
@@ -152,6 +162,7 @@ const Home = () => {
                             mode={mode} 
                             dragHandleProps={provided.dragHandleProps}
                             onUpdate={(newContent) => handleCardUpdate(element.order, newContent)}
+                            onDelete={() => handleDeleteCard(element.order)}
                           />
                           <ExpandMoreIcon sx={{ mt: 1, color: 'text.secondary' }} />
                         </Grid>
