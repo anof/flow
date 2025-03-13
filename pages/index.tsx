@@ -8,6 +8,7 @@ import AddIcon from '@material-ui/icons/Add';
 import FlowHeader from '../components/flow/header/FlowHeader';
 import FlowCard from '../components/flow/card/FlowCard';
 import {modeTypes} from '../customTypes';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -58,17 +59,61 @@ const Home = ({classes}: any) => {
   ] as any);
   const [mode, setMode] = useState('edit' as modeTypes);
 
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const items = Array.from(list) as cardFields[];
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    // Update order numbers
+    const updatedItems = items.map((item: cardFields, index) => ({
+      ...item,
+      order: index + 1
+    }));
+
+    setList(updatedItems);
+  };
 
   const renderCards = (list: [cardFields]) => {
     return (
-      list.map((el: any, i: number) => {
-        return (
-          <>
-            <FlowCard element={el} key={el.order} mode={mode}/>
-            {i === list.length - 1 ? null : <ExpandMoreIcon/>}
-          </>
-        );
-      })
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="cards">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            >
+              {list.map((el: any, i: number) => (
+                <Draggable
+                  key={el.order}
+                  draggableId={el.order.toString()}
+                  index={i}
+                  isDragDisabled={mode !== 'edit'}
+                >
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={{
+                        ...provided.draggableProps.style,
+                        width: '100%',
+                        marginBottom: '1em'
+                      }}
+                    >
+                      <FlowCard element={el} mode={mode} />
+                      {i === list.length - 1 ? null : <ExpandMoreIcon />}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     );
   };
 
