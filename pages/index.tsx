@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../layouts/Layout';
 import { Button, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -17,43 +17,72 @@ const StyledRoot = styled(Grid)(({ theme }) => ({
 }));
 
 const StyledAddButton = styled(Button)(({ theme }) => ({
-  marginTop: '1em',
+  marginTop: theme.spacing(4),
   [theme.breakpoints.up('md')]: {
-    width: '10%',
+    width: '200px',
   },
   [theme.breakpoints.down('md')]: {
-    width: '50%'
+    width: '200px'
   }
 }));
 
-const StyledOptionsContainer = styled(Grid)({
+const StyledOptionsContainer = styled(Grid)(({ theme }) => ({
   position: 'absolute',
   bottom: '2em',
   left: '50%',
   transform: 'translateX(-50%)',
   width: '100%',
-});
+  maxWidth: '600px',
+  zIndex: 1000,
+  display: 'flex',
+  justifyContent: 'center',
+}));
+
+type CardContent = string | { url: string; name: string };
+
+interface Card {
+  type: string;
+  content: CardContent;
+  order: number;
+}
 
 const Home = () => {
   const [mode, setMode] = useState<modeTypes>('edit');
   const [showOptions, setShowOptions] = useState(false);
-  const [list, setList] = useState([
+  const [list, setList] = useState<Card[]>([
     {
       type: 'link',
-      content: 'First card',
+      content: { url: 'https://example.com', name: 'Example Link' },
       order: 1
     },
     {
       type: 'image',
-      content: 'Second card',
+      content: '',
       order: 2
     }
   ]);
   const [isClient, setIsClient] = useState(false);
+  const optionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (optionsRef.current && !optionsRef.current.contains(event.target as Node)) {
+        setShowOptions(false);
+      }
+    };
+
+    if (showOptions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showOptions]);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -71,14 +100,26 @@ const Home = () => {
   };
 
   const handleAddNewCard = (type: string) => {
+    const initialContent: CardContent = type === 'link' 
+      ? { url: '', name: '' }
+      : '';
+
     setList(list => [...list,
       {
         type,
-        content: '',
+        content: initialContent,
         order: list.length + 1
       }
     ]);
     setShowOptions(false);
+  };
+
+  const handleCardUpdate = (order: number, newContent: CardContent) => {
+    setList(list => list.map(item => 
+      item.order === order 
+        ? { ...item, content: newContent }
+        : item
+    ));
   };
 
   if (!isClient) {
@@ -110,6 +151,7 @@ const Home = () => {
                             element={element} 
                             mode={mode} 
                             dragHandleProps={provided.dragHandleProps}
+                            onUpdate={(newContent) => handleCardUpdate(element.order, newContent)}
                           />
                           <ExpandMoreIcon sx={{ mt: 1, color: 'text.secondary' }} />
                         </Grid>
@@ -125,18 +167,20 @@ const Home = () => {
 
         {mode === 'edit' && (
           <StyledOptionsContainer>
-            {showOptions ? (
-              <NewCardOptions onSelect={handleAddNewCard} />
-            ) : (
-              <StyledAddButton
-                variant="contained"
-                color="primary"
-                onClick={() => setShowOptions(true)}
-                endIcon={<ExpandMoreIcon />}
-              >
-                Add card
-              </StyledAddButton>
-            )}
+            <div ref={optionsRef}>
+              {showOptions ? (
+                <NewCardOptions onSelect={handleAddNewCard} />
+              ) : (
+                <StyledAddButton
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setShowOptions(true)}
+                  endIcon={<ExpandMoreIcon />}
+                >
+                  Add card
+                </StyledAddButton>
+              )}
+            </div>
           </StyledOptionsContainer>
         )}
       </StyledRoot>

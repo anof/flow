@@ -4,15 +4,20 @@ import { styled } from '@mui/material/styles';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { capitalize } from 'lodash';
 import { getBackgroundColor } from '../../../styles/cardsTypesColors';
+import ImageCard from './types/ImageCard';
+import LinkCard from './types/LinkCard';
+import TextCard from './types/TextCard';
+import FlowCardType from './types/FlowCard';
 
 interface Props {
   element: {
     type: string;
-    content: string;
+    content: any;
     order: number;
   };
   mode: 'edit' | 'preview';
   dragHandleProps?: any;
+  onUpdate?: (content: any) => void;
 }
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -52,8 +57,47 @@ const StyledDragHandle = styled(Box)({
   alignItems: 'center',
 });
 
-const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps }) => {
+const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps, onUpdate }) => {
   const backgroundColor = getBackgroundColor(element.type);
+  
+  const renderCardContent = () => {
+    switch (element.type) {
+      case 'image':
+        return (
+          <ImageCard
+            content={element.content}
+            mode={mode}
+            onUpdate={onUpdate || (() => {})}
+          />
+        );
+      case 'link':
+        return (
+          <LinkCard
+            content={element.content || { url: '', name: '' }}
+            mode={mode}
+            onUpdate={onUpdate || (() => {})}
+          />
+        );
+      case 'text':
+        return (
+          <TextCard
+            content={element.content || ''}
+            mode={mode}
+            onUpdate={onUpdate || (() => {})}
+          />
+        );
+      case 'flow':
+        return (
+          <FlowCardType
+            content={element.content || ''}
+            mode={mode}
+            onUpdate={onUpdate || (() => {})}
+          />
+        );
+      default:
+        return null;
+    }
+  };
   
   return (
     <Grid container item justifyContent="center" xs={12}>
@@ -78,7 +122,7 @@ const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps }) => {
           </Grid>
           <Grid item xs={12}>
             <StyledContent>
-              {element.content}
+              {renderCardContent()}
             </StyledContent>
           </Grid>
         </Grid>
