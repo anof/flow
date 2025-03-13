@@ -49,18 +49,7 @@ interface Card {
 const Home = () => {
   const [mode, setMode] = useState<modeTypes>('edit');
   const [showOptions, setShowOptions] = useState(false);
-  const [list, setList] = useState<Card[]>([
-    {
-      type: 'link',
-      content: { url: 'https://example.com', name: 'Example Link' },
-      order: 1
-    },
-    {
-      type: 'image',
-      content: '',
-      order: 2
-    }
-  ]);
+  const [list, setList] = useState<Card[]>([]);
   const [isClient, setIsClient] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
 

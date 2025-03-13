@@ -49,7 +49,7 @@ const TextCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
         rows={4}
         value={content}
         onChange={(e) => onUpdate(e.target.value)}
-        placeholder="Enter your text here..."
+        placeholder="Write your thoughts, notes, or any text content here..."
         InputProps={{
           startAdornment: <TextFieldsIcon sx={{ mr: 1, color: 'text.secondary' }} />,
         }}

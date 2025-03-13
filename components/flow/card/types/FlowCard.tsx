@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextField, Typography, Link } from '@mui/material';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 interface Props {
   content: string;
@@ -48,9 +49,19 @@ const FlowCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
             href={content}
             target="_blank"
             rel="noopener noreferrer"
-            sx={{ textDecoration: 'none' }}
+            sx={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              '&:hover': {
+                textDecoration: 'underline',
+              }
+            }}
           >
             View Flow
+            <OpenInNewIcon sx={{ fontSize: 16 }} />
           </Link>
         ) : (
           <>
@@ -76,7 +87,7 @@ const FlowCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
         onChange={handleUrlChange}
         error={!!error}
         helperText={error}
-        placeholder="https://flow.com/your-flow"
+        placeholder="Enter your Flow URL (e.g., https://flow.com/your-flow-name)"
         InputProps={{
           startAdornment: <AccountTreeIcon sx={{ mr: 1, color: 'text.secondary' }} />,
         }}

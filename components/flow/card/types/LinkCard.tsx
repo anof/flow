@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, TextField, Typography, Link } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 interface Props {
   content: {
@@ -59,12 +60,16 @@ const LinkCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
             sx={{ 
               textDecoration: 'none',
               color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
               '&:hover': {
                 textDecoration: 'underline',
               }
             }}
           >
             {content.name || content.url}
+            <OpenInNewIcon sx={{ fontSize: 16 }} />
           </Link>
         ) : (
           <>
@@ -90,7 +95,7 @@ const LinkCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
         onChange={handleUrlChange}
         error={!!error}
         helperText={error}
-        placeholder="https://example.com"
+        placeholder="Enter a valid URL (e.g., https://www.example.com)"
         InputProps={{
           startAdornment: <LinkIcon sx={{ mr: 1, color: 'text.secondary' }} />,
         }}
@@ -100,7 +105,7 @@ const LinkCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
         label="Display Name (optional)"
         value={content.name}
         onChange={handleNameChange}
-        placeholder="Click here to visit..."
+        placeholder="Give your link a friendly name (e.g., Visit our website)"
       />
     </Box>
   );
