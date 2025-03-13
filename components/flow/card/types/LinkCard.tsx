@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextField, Typography, Link } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 
 interface Props {
   content: {
@@ -39,21 +40,43 @@ const LinkCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
 
   if (mode === 'preview') {
     return (
-      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <Link
-          href={content.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{ 
-            textDecoration: 'none',
-            color: '#1976d2',
-            '&:hover': {
-              textDecoration: 'underline',
-            }
-          }}
-        >
-          {content.name || content.url}
-        </Link>
+      <Box 
+        sx={{ 
+          width: '100%', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 1,
+          py: 3
+        }}
+      >
+        {content.url ? (
+          <Link
+            href={content.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              '&:hover': {
+                textDecoration: 'underline',
+              }
+            }}
+          >
+            {content.name || content.url}
+          </Link>
+        ) : (
+          <>
+            <LinkOffIcon sx={{ fontSize: 40, color: 'text.secondary' }} />
+            <Typography variant="body1" color="text.secondary" align="center">
+              No link added yet
+            </Typography>
+            <Typography variant="body2" color="text.secondary" align="center">
+              Switch to edit mode to add a link
+            </Typography>
+          </>
+        )}
       </Box>
     );
   }

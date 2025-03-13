@@ -11,10 +11,32 @@ interface Props {
 const TextCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
   if (mode === 'preview') {
     return (
-      <Box sx={{ width: '100%', p: 2 }}>
-        <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-          {content}
-        </Typography>
+      <Box 
+        sx={{ 
+          width: '100%', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 1,
+          py: 3
+        }}
+      >
+        {content ? (
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+            {content}
+          </Typography>
+        ) : (
+          <>
+            <TextFieldsIcon sx={{ fontSize: 40, color: 'text.secondary' }} />
+            <Typography variant="body1" color="text.secondary" align="center">
+              No text content yet
+            </Typography>
+            <Typography variant="body2" color="text.secondary" align="center">
+              Switch to edit mode to add your text
+            </Typography>
+          </>
+        )}
       </Box>
     );
   }

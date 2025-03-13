@@ -32,15 +32,37 @@ const FlowCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
 
   if (mode === 'preview') {
     return (
-      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <Link
-          href={content}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{ textDecoration: 'none' }}
-        >
-          View Flow
-        </Link>
+      <Box 
+        sx={{ 
+          width: '100%', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 1,
+          py: 3
+        }}
+      >
+        {content ? (
+          <Link
+            href={content}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ textDecoration: 'none' }}
+          >
+            View Flow
+          </Link>
+        ) : (
+          <>
+            <AccountTreeIcon sx={{ fontSize: 40, color: 'text.secondary' }} />
+            <Typography variant="body1" color="text.secondary" align="center">
+              No Flow link added yet
+            </Typography>
+            <Typography variant="body2" color="text.secondary" align="center">
+              Switch to edit mode to add a Flow link
+            </Typography>
+          </>
+        )}
       </Box>
     );
   }
