@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../layouts/Layout';
-import { Button, Grid } from '@mui/material';
+import { Button, Grid, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FlowCard from '../components/flow/card/FlowCard';
@@ -8,6 +8,7 @@ import NewCardOptions from '../components/flow/card/NewCardOptions';
 import ControlButtons from '../components/flow/header/ControlButtons';
 import { modeTypes } from '../customTypes';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { useFlow, Card } from '../hooks/useFlow';
 
 const StyledRoot = styled(Grid)(({ theme }) => ({
   textAlign: 'center',
@@ -38,20 +39,12 @@ const StyledOptionsContainer = styled(Grid)(({ theme }) => ({
   justifyContent: 'center',
 }));
 
-type CardContent = string | { url: string; name: string };
-
-interface Card {
-  type: string;
-  content: CardContent;
-  order: number;
-}
-
 const Home = () => {
   const [mode, setMode] = useState<modeTypes>('edit');
   const [showOptions, setShowOptions] = useState(false);
-  const [list, setList] = useState<Card[]>([]);
   const [isClient, setIsClient] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
+  const { list, loading, addCard, updateCard, deleteCard, updateCardOrder } = useFlow();
 
   useEffect(() => {
     setIsClient(true);
@@ -73,74 +66,48 @@ const Home = () => {
     };
   }, [showOptions]);
 
-  const onDragEnd = (result: any) => {
+  const onDragEnd = async (result: any) => {
     if (!result.destination) return;
 
     const items = Array.from(list);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    const updatedItems = items.map((item, index) => ({
-      ...item,
-      order: index + 1
-    }));
-
-    setList(updatedItems);
+    await updateCardOrder(items);
   };
 
-  const handleAddNewCard = (type: string) => {
-    const initialContent: CardContent = type === 'link' 
-      ? { url: '', name: '' }
-      : '';
-
-    setList(list => [...list,
-      {
-        type,
-        content: initialContent,
-        order: list.length + 1
-      }
-    ]);
+  const handleAddNewCard = async (type: string) => {
+    await addCard(type);
     setShowOptions(false);
   };
 
-  const handleCardUpdate = (order: number, newContent: CardContent) => {
-    setList(list => list.map(item => 
-      item.order === order 
-        ? { ...item, content: newContent }
-        : item
-    ));
+  const handleCardUpdate = async (id: string, newContent: any) => {
+    await updateCard(id, newContent);
   };
 
-  const handleDeleteCard = (order: number) => {
-    setList(list => {
-      const filteredList = list.filter(item => item.order !== order);
-      return filteredList.map((item, index) => ({
-        ...item,
-        order: index + 1
-      }));
-    });
+  const handleDeleteCard = async (id: string) => {
+    await deleteCard(id);
   };
 
-  const handleCardTypeChange = (order: number, newType: string) => {
-    setList(list => list.map(item => {
-      if (item.order === order) {
-        // Reset content based on new type
-        const newContent = newType === 'link' 
-          ? { url: '', name: '' }
-          : '';
-
-        return {
-          ...item,
-          type: newType,
-          content: newContent
-        };
-      }
-      return item;
-    }));
+  const handleCardTypeChange = async (id: string, newType: string) => {
+    const newContent = newType === 'link' 
+      ? { url: '', name: '' }
+      : '';
+    await updateCard(id, newContent);
   };
 
   if (!isClient) {
     return null;
+  }
+
+  if (loading) {
+    return (
+      <Layout>
+        <Grid container justifyContent="center" alignItems="center" sx={{ minHeight: '100vh' }}>
+          <CircularProgress />
+        </Grid>
+      </Layout>
+    );
   }
 
   return (
@@ -157,8 +124,8 @@ const Home = () => {
                 <Grid container spacing={1} {...provided.droppableProps} ref={provided.innerRef}>
                   {list.map((element, index) => (
                     <Draggable
-                      key={element.order}
-                      draggableId={element.order.toString()}
+                      key={element.id}
+                      draggableId={element.id!}
                       index={index}
                       isDragDisabled={mode !== 'edit'}
                     >
@@ -168,9 +135,9 @@ const Home = () => {
                             element={element} 
                             mode={mode} 
                             dragHandleProps={provided.dragHandleProps}
-                            onUpdate={(newContent) => handleCardUpdate(element.order, newContent)}
-                            onDelete={() => handleDeleteCard(element.order)}
-                            onTypeChange={(newType) => handleCardTypeChange(element.order, newType)}
+                            onUpdate={(newContent) => handleCardUpdate(element.id!, newContent)}
+                            onDelete={() => handleDeleteCard(element.id!)}
+                            onTypeChange={(newType) => handleCardTypeChange(element.id!, newType)}
                           />
                           {index < list.length - 1 && <ExpandMoreIcon sx={{ mt: 1, color: 'text.secondary' }} />}
                         </Grid>

@@ -10,13 +10,10 @@ import LinkCard from './types/LinkCard';
 import TextCard from './types/TextCard';
 import FlowCardType from './types/FlowCard';
 import NewCardOptions from './NewCardOptions';
+import { Card, CardContent } from '../../../hooks/useFlow';
 
 interface Props {
-  element: {
-    type: string;
-    content: any;
-    order: number;
-  };
+  element: Card;
   mode: 'edit' | 'preview';
   dragHandleProps?: any;
   onUpdate?: (content: any) => void;
@@ -145,7 +142,7 @@ const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps, onUpdate, o
       case 'image':
         return (
           <ImageCard
-            content={element.content}
+            content={element.content as string}
             mode={mode}
             onUpdate={onUpdate || (() => {})}
           />
@@ -153,7 +150,7 @@ const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps, onUpdate, o
       case 'link':
         return (
           <LinkCard
-            content={element.content || { url: '', name: '' }}
+            content={element.content as { url: string; name: string }}
             mode={mode}
             onUpdate={onUpdate || (() => {})}
           />
@@ -161,7 +158,7 @@ const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps, onUpdate, o
       case 'text':
         return (
           <TextCard
-            content={element.content || ''}
+            content={element.content as string}
             mode={mode}
             onUpdate={onUpdate || (() => {})}
           />
@@ -169,7 +166,7 @@ const FlowCard: React.FC<Props> = ({ element, mode, dragHandleProps, onUpdate, o
       case 'flow':
         return (
           <FlowCardType
-            content={element.content || ''}
+            content={element.content as string}
             mode={mode}
             onUpdate={onUpdate || (() => {})}
           />
