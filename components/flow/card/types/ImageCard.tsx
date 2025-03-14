@@ -111,6 +111,7 @@ const ImageCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
             variant="outlined"
             startIcon={<CloudUploadIcon />}
             onClick={() => fileInputRef.current?.click()}
+            sx={{ color: '#000' }}
           >
             Change Image
           </Button>
