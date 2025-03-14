@@ -29,13 +29,21 @@ export const useFlow = (workflowId?: string) => {
     const workflowRef = doc(db, 'workflows', workflowId);
     const unsubscribe = onSnapshot(workflowRef, (doc) => {
       if (doc.exists()) {
-        setWorkflow({ id: doc.id, ...doc.data() } as Workflow);
+        const data = doc.data() as Workflow;
+        // Allow access if workflow is public or user owns it
+        if (data.isPublic || (user && data.userId === user.id)) {
+          setWorkflow({ ...data, id: doc.id });
+        } else {
+          setWorkflow(null);
+        }
+      } else {
+        setWorkflow(null);
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [workflowId]);
+  }, [workflowId, user]);
 
   const createWorkflow = async (name: string, description?: string) => {
     if (!user) throw new Error('User not authenticated');

@@ -10,6 +10,8 @@ import ControlButtons from '../../components/flow/header/ControlButtons';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ShareIcon from '@mui/icons-material/Share';
+import PublicIcon from '@mui/icons-material/Public';
+import LockIcon from '@mui/icons-material/Lock';
 import { modeTypes } from '../../customTypes';
 import { Card } from '../../types/workflow';
 
@@ -99,10 +101,14 @@ const WorkflowPage = () => {
     if (!workflow) return;
     
     try {
-      await updateWorkflow({ isPublic: true });
-      const shareUrl = `${window.location.origin}/workflows/${workflow.id}`;
-      await navigator.clipboard.writeText(shareUrl);
-      // You might want to show a success message here
+      const newIsPublic = !workflow.isPublic;
+      await updateWorkflow({ isPublic: newIsPublic });
+      
+      if (newIsPublic) {
+        const shareUrl = `${window.location.origin}/workflows/${workflow.id}`;
+        await navigator.clipboard.writeText(shareUrl);
+        // You might want to show a success message here
+      }
     } catch (error) {
       console.error('Error sharing workflow:', error);
     }
@@ -128,29 +134,61 @@ const WorkflowPage = () => {
     );
   }
 
-  console.log('Debug workflow access:', {
-    isPublic: workflow.isPublic,
-    workflowUserId: workflow.userId,
-    currentUserId: user?.id,
-    authLoading,
-    workflow: workflow
-  });
-
-  // If the workflow is not public and the user is not the owner, redirect to workflows page
+  // If the workflow is not public and the user is not the owner, show access denied message
   if (!workflow.isPublic && (!user || workflow.userId !== user.id)) {
-    console.log('Redirecting to workflows because:', {
-      isPublic: workflow.isPublic,
-      noUser: !user,
-      notOwner: workflow.userId !== user?.id,
-      authLoading
-    });
-    router.push('/workflows');
-    return null;
+    return (
+      <Layout>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Box 
+            display="flex" 
+            flexDirection="column" 
+            alignItems="center" 
+            justifyContent="center" 
+            minHeight="60vh"
+            textAlign="center"
+          >
+            <LockIcon sx={{ fontSize: 60, color: 'error.main', mb: 2 }} />
+            <Typography variant="h5" gutterBottom>
+              Access Denied
+            </Typography>
+            <Typography color="text.secondary" paragraph>
+              This workflow is private and can only be accessed by its owner.
+            </Typography>
+            {!user ? (
+              <Button 
+                variant="contained" 
+                onClick={() => router.push('/login')}
+                sx={{ mt: 2 }}
+              >
+                Login to Access
+              </Button>
+            ) : (
+              <Button 
+                variant="contained" 
+                onClick={() => router.push('/workflows')}
+                sx={{ mt: 2 }}
+              >
+                Go to My Workflows
+              </Button>
+            )}
+          </Box>
+        </Container>
+      </Layout>
+    );
   }
 
-  // If the user is not the owner, force view mode
+  // If the user is not the owner, force preview mode
   const isOwner = user && workflow.userId === user.id;
-  const effectiveMode = isOwner ? mode : 'view';
+  const effectiveMode = isOwner ? mode : 'preview';
+
+  console.log('Debug workflow page:', {
+    isOwner,
+    userId: user?.id,
+    workflowUserId: workflow.userId,
+    mode,
+    effectiveMode,
+    isPublic: workflow.isPublic
+  });
 
   return (
     <Layout>
@@ -159,17 +197,29 @@ const WorkflowPage = () => {
           <Typography variant="h4" component="h1">
             {workflow.name}
           </Typography>
-          <Box>
+          <Box display="flex" alignItems="center" gap={2}>
             {isOwner && (
               <Button
-                startIcon={<ShareIcon />}
+                variant="contained"
+                color="primary"
+                startIcon={workflow.isPublic ? <PublicIcon /> : <LockIcon />}
                 onClick={handleShare}
-                sx={{ mr: 2 }}
+                sx={{ 
+                  minWidth: '120px',
+                  backgroundColor: workflow.isPublic ? 'success.main' : 'primary.main',
+                  '&:hover': {
+                    backgroundColor: workflow.isPublic ? 'success.dark' : 'primary.dark'
+                  }
+                }}
               >
-                Share
+                {workflow.isPublic ? 'Public' : 'Private'}
               </Button>
             )}
-            {isOwner && <ControlButtons mode={mode} setMode={setMode} />}
+            {isOwner && (
+              <Box sx={{ ml: 2 }}>
+                <ControlButtons mode={mode} setMode={setMode} />
+              </Box>
+            )}
           </Box>
         </Box>
 

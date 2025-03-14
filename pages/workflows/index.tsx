@@ -15,6 +15,8 @@ import {
   Box
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import PublicIcon from '@mui/icons-material/Public';
+import LockIcon from '@mui/icons-material/Lock';
 import { useFlow } from '../../hooks/useFlow';
 import { useAuth } from '../../hooks/useAuth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -95,9 +97,16 @@ const WorkflowsPage = () => {
                 onClick={() => router.push(`/workflows/${workflow.id}`)}
               >
                 <CardContent>
-                  <Typography variant="h6" component="h2" gutterBottom>
-                    {workflow.name}
-                  </Typography>
+                  <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+                    <Typography variant="h6" component="h2">
+                      {workflow.name}
+                    </Typography>
+                    {workflow.isPublic ? (
+                      <PublicIcon sx={{ fontSize: 20, color: 'success.main' }} />
+                    ) : (
+                      <LockIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                    )}
+                  </Box>
                   {workflow.description && (
                     <Typography color="text.secondary" gutterBottom>
                       {workflow.description}
