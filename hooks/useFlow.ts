@@ -112,9 +112,15 @@ export const useFlow = (workflowId?: string) => {
   const updateCardOrder = async (cards: Card[]) => {
     if (!workflow) throw new Error('No workflow selected');
 
+    // Ensure all cards have the correct order number
+    const updatedCards = cards.map((card, index) => ({
+      ...card,
+      order: index + 1
+    }));
+
     const workflowRef = doc(db, 'workflows', workflow.id);
     await updateDoc(workflowRef, {
-      cards,
+      cards: updatedCards,
       updatedAt: new Date()
     });
   };

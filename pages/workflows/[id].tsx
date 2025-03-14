@@ -45,7 +45,13 @@ const WorkflowPage = () => {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    await updateCardOrder(items);
+    // Update order numbers for all cards
+    const updatedItems = items.map((card, index) => ({
+      ...card,
+      order: index + 1
+    }));
+
+    await updateCardOrder(updatedItems);
   };
 
   const handleAddNewCard = async (type: string) => {
