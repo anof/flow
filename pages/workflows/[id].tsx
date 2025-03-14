@@ -229,7 +229,7 @@ const WorkflowPage = () => {
           </Typography>
         )}
 
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ mt: 4, mb: 12 }}>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable">
               {(provided) => (
