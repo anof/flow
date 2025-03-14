@@ -258,6 +258,16 @@ const TextCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
     onUpdate: ({ editor }: { editor: Editor }) => {
       onUpdate(editor.getHTML());
     },
+    editorProps: {
+      attributes: {
+        class: 'focus:outline-none min-h-[100px] px-4',
+      },
+    },
+    enableCoreExtensions: true,
+    enableInputRules: true,
+    enablePasteRules: true,
+    enablePlugins: true,
+    immediatelyRender: false
   });
 
   if (mode === 'preview') {

@@ -145,8 +145,8 @@ const WorkflowPage = () => {
                 <Box {...provided.droppableProps} ref={provided.innerRef}>
                   {workflow.cards.map((element, index) => (
                     <Draggable
-                      key={element.id}
-                      draggableId={element.id!}
+                      key={element.id || `card-${index}`}
+                      draggableId={element.id || `card-${index}`}
                       index={index}
                       isDragDisabled={effectiveMode !== 'edit'}
                     >
@@ -157,7 +157,7 @@ const WorkflowPage = () => {
                           sx={{ mb: 2 }}
                         >
                           <FlowCard 
-                            element={element} 
+                            element={{...element, id: element.id || `card-${index}`}}
                             mode={effectiveMode} 
                             dragHandleProps={provided.dragHandleProps}
                             onUpdate={(newContent) => handleCardUpdate(element.id!, newContent)}

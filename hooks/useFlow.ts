@@ -70,6 +70,7 @@ export const useFlow = (workflowId?: string) => {
       : '';
 
     const newCard: Card = {
+      id: Math.random().toString(36).substr(2, 9),
       type,
       content: initialContent,
       order: workflow.cards.length + 1
