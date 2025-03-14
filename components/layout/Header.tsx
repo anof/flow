@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -18,26 +18,46 @@ const Header = () => {
 
   return (
     <AppBar position="static">
-      <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: 1, cursor: 'pointer' }}
-          onClick={() => router.push('/workflows')}
-        >
-          Flow
-        </Typography>
-        {user && (
-          <Box>
-            <Typography component="span" sx={{ mr: 2 }}>
-              {user.name || user.email}
-            </Typography>
-            <Button color="inherit" onClick={handleLogout}>
-              Logout
-            </Button>
-          </Box>
-        )}
-      </Toolbar>
+      <Container maxWidth="lg">
+        <Toolbar disableGutters>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ 
+              flexGrow: 1, 
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+            onClick={() => router.push('/workflows')}
+          >
+            Flow
+          </Typography>
+          {user && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography 
+                component="span" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  display: { xs: 'none', sm: 'block' }
+                }}
+              >
+                {user.name || user.email}
+              </Typography>
+              <Button 
+                color="inherit" 
+                onClick={handleLogout}
+                sx={{ 
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+              >
+                Logout
+              </Button>
+            </Box>
+          )}
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 };

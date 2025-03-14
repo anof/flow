@@ -21,7 +21,7 @@ export const useFlow = (workflowId?: string) => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!workflowId || !user) {
+    if (!workflowId) {
       setLoading(false);
       return;
     }
@@ -35,7 +35,7 @@ export const useFlow = (workflowId?: string) => {
     });
 
     return () => unsubscribe();
-  }, [workflowId, user]);
+  }, [workflowId]);
 
   const createWorkflow = async (name: string, description?: string) => {
     if (!user) throw new Error('User not authenticated');
@@ -84,11 +84,11 @@ export const useFlow = (workflowId?: string) => {
     });
   };
 
-  const updateCard = async (id: string, newContent: CardContent) => {
+  const updateCard = async (id: string, updates: { type?: string; content: CardContent }) => {
     if (!workflow) throw new Error('No workflow selected');
 
     const updatedCards = workflow.cards.map(card => 
-      card.id === id ? { ...card, content: newContent } : card
+      card.id === id ? { ...card, ...updates } : card
     );
 
     const workflowRef = doc(db, 'workflows', workflow.id);

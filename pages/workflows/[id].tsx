@@ -11,16 +11,16 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ShareIcon from '@mui/icons-material/Share';
 import { modeTypes } from '../../customTypes';
-import { withAuth } from '../../components/auth/withAuth';
+import { Card } from '../../types/workflow';
 
 const WorkflowPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [mode, setMode] = React.useState<modeTypes>('edit');
   const [showOptions, setShowOptions] = React.useState(false);
   const optionsRef = React.useRef<HTMLDivElement>(null);
-  const { workflow, loading, addCard, updateCard, deleteCard, updateCardOrder, updateWorkflow } = useFlow(id as string);
+  const { workflow, loading: workflowLoading, addCard, updateCard, deleteCard, updateCardOrder, updateWorkflow } = useFlow(id as string);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,10 +62,26 @@ const WorkflowPage = () => {
   };
 
   const handleCardTypeChange = async (id: string, newType: string) => {
-    const newContent = newType === 'link' 
-      ? { url: '', name: '' }
-      : '';
-    await updateCard(id, newContent);
+    if (!workflow) return;
+
+    const cardToUpdate = workflow.cards.find(card => card.id === id);
+    if (!cardToUpdate) return;
+
+    const newCard: Card = {
+      ...cardToUpdate,
+      type: newType,
+      content: newType === 'link' 
+        ? { url: '', name: '' }
+        : newType === 'flow'
+        ? ''
+        : newType === 'text'
+        ? ''
+        : newType === 'image'
+        ? ''
+        : ''
+    };
+
+    await updateCard(id, { type: newType, content: newCard.content });
   };
 
   const handleShare = async () => {
@@ -81,7 +97,7 @@ const WorkflowPage = () => {
     }
   };
 
-  if (loading) {
+  if (workflowLoading || authLoading) {
     return (
       <Layout>
         <Container>
@@ -101,14 +117,28 @@ const WorkflowPage = () => {
     );
   }
 
+  console.log('Debug workflow access:', {
+    isPublic: workflow.isPublic,
+    workflowUserId: workflow.userId,
+    currentUserId: user?.id,
+    authLoading,
+    workflow: workflow
+  });
+
   // If the workflow is not public and the user is not the owner, redirect to workflows page
-  if (!workflow.isPublic && workflow.userId !== user?.id) {
+  if (!workflow.isPublic && (!user || workflow.userId !== user.id)) {
+    console.log('Redirecting to workflows because:', {
+      isPublic: workflow.isPublic,
+      noUser: !user,
+      notOwner: workflow.userId !== user?.id,
+      authLoading
+    });
     router.push('/workflows');
     return null;
   }
 
   // If the user is not the owner, force view mode
-  const isOwner = workflow.userId === user?.id;
+  const isOwner = user && workflow.userId === user.id;
   const effectiveMode = isOwner ? mode : 'view';
 
   return (
@@ -224,4 +254,4 @@ const WorkflowPage = () => {
   );
 };
 
-export default withAuth(WorkflowPage); 
+export default WorkflowPage; 

@@ -1,7 +1,7 @@
-export type CardContent = string | { url: string; name: string };
+export type CardContent = string | { url: string; name: string } | { type: string; content: CardContent };
 
 export interface Card {
-  id?: string;
+  id: string;
   type: string;
   content: CardContent;
   order: number;
