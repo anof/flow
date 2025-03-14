@@ -54,10 +54,16 @@ const ImageCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
         }}
       >
         {content ? (
-          <img 
-            src={content} 
-            alt="Flow card image" 
-            style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain' }}
+          <Box
+            component="img"
+            src={content}
+            alt="Flow card image"
+            sx={{
+              maxWidth: '100%',
+              maxHeight: '300px',
+              objectFit: 'contain',
+              borderRadius: 1
+            }}
           />
         ) : (
           <>
@@ -78,57 +84,54 @@ const ImageCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
     <Box
       sx={{
         width: '100%',
-        minHeight: '200px',
-        border: '2px dashed #ccc',
-        borderRadius: 1,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
         gap: 2,
-        p: 2,
+        py: 2
       }}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <input
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        ref={fileInputRef}
-        onChange={handleImageUpload}
-      />
-      
       {content ? (
         <>
-          <img 
-            src={content} 
-            alt="Preview" 
-            style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain' }}
+          <Box
+            component="img"
+            src={content}
+            alt="Flow card image"
+            sx={{
+              maxWidth: '100%',
+              maxHeight: '300px',
+              objectFit: 'contain',
+              borderRadius: 1,
+              mb: 2
+            }}
           />
           <Button
-            variant="contained"
+            variant="outlined"
             startIcon={<CloudUploadIcon />}
             onClick={() => fileInputRef.current?.click()}
           >
-            Replace Image
+            Change Image
           </Button>
         </>
       ) : (
-        <>
-          <ImageIcon sx={{ fontSize: 48, color: 'text.secondary' }} />
-          <Typography variant="body1" color="text.secondary">
-            Drag and drop an image here or
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<CloudUploadIcon />}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Upload Image
-          </Button>
-        </>
+        <Button
+          variant="outlined"
+          startIcon={<CloudUploadIcon />}
+          onClick={() => fileInputRef.current?.click()}
+          sx={{ p: 3 }}
+        >
+          Upload Image
+        </Button>
       )}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageUpload}
+        accept="image/*"
+        style={{ display: 'none' }}
+      />
     </Box>
   );
 };

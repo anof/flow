@@ -88,7 +88,7 @@ export const useFlow = (workflowId?: string) => {
     if (!workflow) throw new Error('No workflow selected');
 
     const updatedCards = workflow.cards.map(card => 
-      card.id === id ? { ...card, ...updates } : card
+      card.id === id ? { ...card, ...updates } : { ...card }
     );
 
     const workflowRef = doc(db, 'workflows', workflow.id);

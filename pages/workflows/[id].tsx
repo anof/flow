@@ -54,7 +54,12 @@ const WorkflowPage = () => {
   };
 
   const handleCardUpdate = async (id: string, newContent: any) => {
-    await updateCard(id, newContent);
+    if (!workflow) return;
+
+    const cardToUpdate = workflow.cards.find(card => card.id === id);
+    if (!cardToUpdate) return;
+
+    await updateCard(id, { type: cardToUpdate.type, content: newContent });
   };
 
   const handleDeleteCard = async (id: string) => {

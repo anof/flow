@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Typography, Link, Paper, Divider } from '@mui/material';
+import { Box, TextField, Typography, Button, Paper, Divider, Alert, Chip } from '@mui/material';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 import { Workflow } from '../../../../types/workflow';
+import { useAuth } from '../../../../hooks/useAuth';
+import TextCard from './TextCard';
+import LinkCard from './LinkCard';
+import ImageCard from './ImageCard';
+import { default as FlowCardPreview } from './FlowCard';
 
 interface Props {
   content: string;
@@ -18,56 +24,162 @@ interface PreviewWorkflow {
   cards: Array<any>;
 }
 
+const getCardColor = (type: string) => {
+  switch (type) {
+    case 'text':
+      return '#4CAF50';
+    case 'link':
+      return '#2196F3';
+    case 'image':
+      return '#9C27B0';
+    case 'flow':
+      return '#FF9800';
+    default:
+      return '#757575';
+  }
+};
+
 const FlowCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
   const [error, setError] = useState<string | null>(null);
   const [previewWorkflow, setPreviewWorkflow] = useState<PreviewWorkflow | null>(null);
+  const { user } = useAuth();
 
-  const validateFlowUrl = (url: string) => {
-    try {
-      const parsedUrl = new URL(url);
-      return parsedUrl.hostname === 'flow-a5317.web.app' && parsedUrl.pathname.startsWith('/workflow/');
-    } catch {
-      return false;
-    }
+  const validateWorkflowId = (id: string) => {
+    // Basic validation: non-empty string with no spaces or special characters
+    return /^[a-zA-Z0-9]+$/.test(id);
   };
 
-  const handleUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const url = event.target.value;
-    if (!validateFlowUrl(url)) {
-      setError('Please enter a valid Flow URL (https://flow-a5317.web.app/workflow/*)');
+  const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const id = event.target.value;
+    if (!validateWorkflowId(id)) {
+      setError('Please enter a valid workflow ID');
     } else {
       setError(null);
     }
-    onUpdate(url);
+    onUpdate(id);
+  };
+
+  const renderCard = (card: any, index: number) => {
+    const cardProps = {
+      content: card.content,
+      mode: 'preview' as const,
+      onUpdate: () => {}
+    };
+
+    const cardColor = getCardColor(card.type);
+
+    return (
+      <Box 
+        key={card.id} 
+        sx={{ 
+          position: 'relative',
+          mb: 3,
+          '&:last-child': {
+            mb: 0
+          }
+        }}
+      >
+        <Paper
+          elevation={0}
+          sx={{
+            position: 'relative',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1,
+            overflow: 'visible'
+          }}
+        >
+          <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
+            <Chip
+              label={card.type.charAt(0).toUpperCase() + card.type.slice(1)}
+              size="small"
+              sx={{
+                bgcolor: cardColor,
+                color: 'white',
+                fontWeight: 500,
+                fontSize: '0.75rem'
+              }}
+            />
+          </Box>
+          <Box sx={{ p: 2, pt: 4 }}>
+            {(() => {
+              switch (card.type) {
+                case 'text':
+                  return <TextCard {...cardProps} />;
+                case 'link':
+                  return <LinkCard {...cardProps} />;
+                case 'image':
+                  return <ImageCard {...cardProps} />;
+                case 'flow':
+                  return <FlowCardPreview {...cardProps} />;
+                default:
+                  return null;
+              }
+            })()}
+          </Box>
+        </Paper>
+        <Box 
+          sx={{ 
+            position: 'absolute',
+            left: '50%',
+            bottom: -24,
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0.5,
+            color: 'text.secondary',
+            fontSize: '0.75rem',
+            bgcolor: 'background.paper',
+            px: 1,
+            py: 0.5,
+            zIndex: 1
+          }}
+        >
+          {index + 1}
+          <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
+        </Box>
+      </Box>
+    );
   };
 
   useEffect(() => {
     const fetchWorkflowPreview = async () => {
-      if (!content || mode !== 'preview') return;
+      if (!content || mode !== 'preview') {
+        setPreviewWorkflow(null);
+        return;
+      }
 
       try {
-        const url = new URL(content);
-        const workflowId = url.pathname.split('/').pop();
-        if (!workflowId) return;
-
-        const workflowRef = doc(db, 'workflows', workflowId);
+        const workflowRef = doc(db, 'workflows', content);
         const workflowDoc = await getDoc(workflowRef);
         
-        if (workflowDoc.exists() && workflowDoc.data().isPublic) {
+        if (workflowDoc.exists()) {
           const data = workflowDoc.data() as Workflow;
-          setPreviewWorkflow({
-            name: data.name,
-            description: data.description,
-            cards: data.cards.slice(0, 2) // Only get first 2 cards
-          });
+          // Allow access if workflow is public or user owns it
+          if (data.isPublic || data.userId === user?.id) {
+            setPreviewWorkflow({
+              name: data.name,
+              description: data.description,
+              cards: data.cards.slice(0, 2)
+            });
+          } else {
+            setPreviewWorkflow(null);
+            setError('You do not have access to this workflow');
+          }
+        } else {
+          setPreviewWorkflow(null);
+          setError('Workflow not found');
         }
       } catch (error) {
         console.error('Error fetching workflow preview:', error);
+        setPreviewWorkflow(null);
+        setError('Error loading workflow');
       }
     };
 
     fetchWorkflowPreview();
-  }, [content, mode]);
+  }, [content, mode, user?.id]);
 
   if (mode === 'preview') {
     return (
@@ -106,21 +218,32 @@ const FlowCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
               <Box sx={{ p: 2 }}>
                 {previewWorkflow.cards.length > 0 ? (
                   <>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Preview of first {Math.min(previewWorkflow.cards.length, 2)} cards:
-                    </Typography>
-                    {previewWorkflow.cards.map((card, index) => (
-                      <Box key={index} sx={{ mb: 1 }}>
-                        <Typography variant="body2">
-                          {index + 1}. {card.type.charAt(0).toUpperCase() + card.type.slice(1)} card
-                        </Typography>
-                      </Box>
-                    ))}
-                    {previewWorkflow.cards.length > 2 && (
-                      <Typography variant="body2" color="text.secondary">
-                        ... and {previewWorkflow.cards.length - 2} more cards
-                      </Typography>
-                    )}
+                    <Box 
+                      sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        position: 'relative',
+                        '& > *': {
+                          position: 'relative'
+                        }
+                      }}
+                    >
+                      {previewWorkflow.cards.map((card, index) => renderCard(card, index))}
+                    </Box>
+                    <Alert 
+                      severity="info" 
+                      sx={{ 
+                        mt: 4,
+                        '& .MuiAlert-message': {
+                          width: '100%',
+                          textAlign: 'center'
+                        }
+                      }}
+                    >
+                      {previewWorkflow.cards.length > 2 
+                        ? `This workflow contains ${previewWorkflow.cards.length} cards. Click "View Full Workflow" to see all cards.`
+                        : 'Click "View Full Workflow" to see the complete workflow.'}
+                    </Alert>
                   </>
                 ) : (
                   <Typography variant="body2" color="text.secondary">
@@ -131,31 +254,41 @@ const FlowCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
               <Box 
                 sx={{ 
                   p: 2, 
-                  bgcolor: 'action.hover',
+                  bgcolor: 'background.paper',
                   display: 'flex',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  borderTop: '1px solid',
+                  borderColor: 'divider'
                 }}
               >
-                <Link
-                  href={content}
+                <Button
+                  href={`${window.location.origin}/workflows/${content}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  variant="contained"
                   sx={{ 
-                    textDecoration: 'none',
-                    color: 'primary.main',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    bgcolor: 'grey.300',
+                    color: 'text.primary',
+                    boxShadow: 1,
                     '&:hover': {
-                      textDecoration: 'underline',
+                      bgcolor: 'grey.400'
                     }
                   }}
+                  endIcon={<OpenInNewIcon />}
                 >
                   View Full Workflow
-                  <OpenInNewIcon sx={{ fontSize: 16 }} />
-                </Link>
+                </Button>
               </Box>
             </Paper>
+          ) : error ? (
+            <Box sx={{ textAlign: 'center' }}>
+              <AccountTreeIcon sx={{ fontSize: 40, color: 'error.main' }} />
+              <Typography variant="body2" color="error">
+                {error}
+              </Typography>
+            </Box>
           ) : (
             <Box sx={{ textAlign: 'center' }}>
               <AccountTreeIcon sx={{ fontSize: 40, color: 'text.secondary' }} />
@@ -183,12 +316,12 @@ const FlowCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
     <Box sx={{ width: '100%' }}>
       <TextField
         fullWidth
-        label="Flow URL"
-        value={content}
-        onChange={handleUrlChange}
+        label="Workflow ID"
+        value={content || ''}
+        onChange={handleIdChange}
         error={!!error}
-        helperText={error}
-        placeholder="Enter your Flow URL (e.g., https://flow-a5317.web.app/workflow/your-flow-id)"
+        helperText={error || "Enter the workflow ID (e.g., iplbMCBuQ9q2zh4pY64D)"}
+        placeholder="Enter workflow ID"
         InputProps={{
           startAdornment: <AccountTreeIcon sx={{ mr: 1, color: 'text.secondary' }} />,
         }}

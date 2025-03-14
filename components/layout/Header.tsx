@@ -37,7 +37,7 @@ const Header = () => {
               <Typography 
                 component="span" 
                 sx={{ 
-                  color: 'rgba(255, 255, 255, 0.7)',
+                  color: 'text.primary',
                   display: { xs: 'none', sm: 'block' }
                 }}
               >

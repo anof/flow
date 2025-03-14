@@ -253,7 +253,7 @@ const TextCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
       TextStyle,
       Color,
     ],
-    content: content || '',
+    content: typeof content === 'string' ? content : '',
     editable: mode === 'edit',
     onUpdate: ({ editor }: { editor: Editor }) => {
       onUpdate(editor.getHTML());

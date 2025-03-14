@@ -90,22 +90,22 @@ const LinkCard: React.FC<Props> = ({ content, mode, onUpdate }) => {
     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
       <TextField
         fullWidth
-        label="URL"
-        value={content.url}
+        label="Link URL"
+        value={content.url || ''}
         onChange={handleUrlChange}
         error={!!error}
         helperText={error}
-        placeholder="Enter a valid URL (e.g., https://www.example.com)"
+        placeholder="Enter your URL (e.g., https://example.com)"
         InputProps={{
           startAdornment: <LinkIcon sx={{ mr: 1, color: 'text.secondary' }} />,
         }}
       />
       <TextField
         fullWidth
-        label="Display Name (optional)"
-        value={content.name}
+        label="Link Name (optional)"
+        value={content.name || ''}
         onChange={handleNameChange}
-        placeholder="Give your link a friendly name (e.g., Visit our website)"
+        placeholder="Enter a name for your link"
       />
     </Box>
   );
