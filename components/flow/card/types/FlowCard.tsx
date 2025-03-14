@@ -5,7 +5,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 interface Props {
   content: string;
-  mode: 'edit' | 'preview';
+  mode: 'edit' | 'preview' | 'view';
   onUpdate: (content: string) => void;
 }
 

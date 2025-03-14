@@ -10,11 +10,11 @@ import LinkCard from './types/LinkCard';
 import TextCard from './types/TextCard';
 import FlowCardType from './types/FlowCard';
 import NewCardOptions from './NewCardOptions';
-import { Card, CardContent } from '../../../hooks/useFlow';
+import { Card, CardContent } from '../../../types/workflow';
 
 interface Props {
   element: Card;
-  mode: 'edit' | 'preview';
+  mode: 'edit' | 'preview' | 'view';
   dragHandleProps?: any;
   onUpdate?: (content: any) => void;
   onDelete?: () => void;

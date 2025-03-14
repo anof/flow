@@ -2,6 +2,7 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import Header from '../components/layout/Header';
+import { useAuth } from '../hooks/useAuth';
 
 const StyledLayout = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
@@ -9,9 +10,11 @@ const StyledLayout = styled(Box)(({ theme }) => ({
 }));
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+
   return (
     <StyledLayout>
-      <Header />
+      {user && <Header />}
       {children}
     </StyledLayout>
   );

@@ -6,7 +6,7 @@ import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 
 interface Props {
   content: string;
-  mode: 'edit' | 'preview';
+  mode: 'edit' | 'preview' | 'view';
   onUpdate: (content: string) => void;
 }
 

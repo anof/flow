@@ -27,7 +27,7 @@ import Color from '@tiptap/extension-color';
 
 interface Props {
   content: string;
-  mode: 'edit' | 'preview';
+  mode: 'edit' | 'preview' | 'view';
   onUpdate: (content: string) => void;
 }
 

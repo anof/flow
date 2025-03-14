@@ -9,7 +9,7 @@ interface Props {
     url: string;
     name: string;
   };
-  mode: 'edit' | 'preview';
+  mode: 'edit' | 'preview' | 'view';
   onUpdate: (content: { url: string; name: string }) => void;
 }
 

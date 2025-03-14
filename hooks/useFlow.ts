@@ -1,72 +1,141 @@
 import { useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { 
+  collection, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  query, 
+  orderBy, 
+  onSnapshot,
+  getDoc,
+  where
+} from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { Workflow, Card, CardContent } from '../types/workflow';
+import { useAuth } from './useAuth';
 
-export type CardContent = string | { url: string; name: string };
-
-export interface Card {
-  id?: string;
-  type: string;
-  content: CardContent;
-  order: number;
-}
-
-export const useFlow = () => {
-  const [list, setList] = useState<Card[]>([]);
+export const useFlow = (workflowId?: string) => {
+  const [workflow, setWorkflow] = useState<Workflow | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const q = query(collection(db, 'cards'), orderBy('order', 'asc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const cards = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Card[];
-      setList(cards);
+    if (!workflowId || !user) {
+      setLoading(false);
+      return;
+    }
+
+    const workflowRef = doc(db, 'workflows', workflowId);
+    const unsubscribe = onSnapshot(workflowRef, (doc) => {
+      if (doc.exists()) {
+        setWorkflow({ id: doc.id, ...doc.data() } as Workflow);
+      }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [workflowId, user]);
+
+  const createWorkflow = async (name: string, description?: string) => {
+    if (!user) throw new Error('User not authenticated');
+
+    const newWorkflow: Omit<Workflow, 'id'> = {
+      name,
+      description,
+      cards: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userId: user.id,
+      isPublic: false
+    };
+
+    const docRef = await addDoc(collection(db, 'workflows'), newWorkflow);
+    
+    // Update user's workflows array
+    const userRef = doc(db, 'users', user.id);
+    await updateDoc(userRef, {
+      workflows: [...user.workflows, docRef.id],
+      updatedAt: new Date()
+    });
+
+    return docRef.id;
+  };
 
   const addCard = async (type: string) => {
+    if (!workflow) throw new Error('No workflow selected');
+
     const initialContent: CardContent = type === 'link' 
       ? { url: '', name: '' }
       : '';
 
-    const newCard = {
+    const newCard: Card = {
       type,
       content: initialContent,
-      order: list.length + 1
+      order: workflow.cards.length + 1
     };
 
-    await addDoc(collection(db, 'cards'), newCard);
+    const updatedCards = [...workflow.cards, newCard];
+    const workflowRef = doc(db, 'workflows', workflow.id);
+    await updateDoc(workflowRef, {
+      cards: updatedCards,
+      updatedAt: new Date()
+    });
   };
 
   const updateCard = async (id: string, newContent: CardContent) => {
-    const cardRef = doc(db, 'cards', id);
-    await updateDoc(cardRef, { content: newContent });
+    if (!workflow) throw new Error('No workflow selected');
+
+    const updatedCards = workflow.cards.map(card => 
+      card.id === id ? { ...card, content: newContent } : card
+    );
+
+    const workflowRef = doc(db, 'workflows', workflow.id);
+    await updateDoc(workflowRef, {
+      cards: updatedCards,
+      updatedAt: new Date()
+    });
   };
 
   const deleteCard = async (id: string) => {
-    const cardRef = doc(db, 'cards', id);
-    await deleteDoc(cardRef);
+    if (!workflow) throw new Error('No workflow selected');
+
+    const updatedCards = workflow.cards.filter(card => card.id !== id);
+    const workflowRef = doc(db, 'workflows', workflow.id);
+    await updateDoc(workflowRef, {
+      cards: updatedCards,
+      updatedAt: new Date()
+    });
   };
 
   const updateCardOrder = async (cards: Card[]) => {
-    const batch = cards.map((card, index) => {
-      const cardRef = doc(db, 'cards', card.id!);
-      return updateDoc(cardRef, { order: index + 1 });
+    if (!workflow) throw new Error('No workflow selected');
+
+    const workflowRef = doc(db, 'workflows', workflow.id);
+    await updateDoc(workflowRef, {
+      cards,
+      updatedAt: new Date()
     });
-    await Promise.all(batch);
+  };
+
+  const updateWorkflow = async (updates: Partial<Workflow>) => {
+    if (!workflow) throw new Error('No workflow selected');
+
+    const workflowRef = doc(db, 'workflows', workflow.id);
+    await updateDoc(workflowRef, {
+      ...updates,
+      updatedAt: new Date()
+    });
   };
 
   return {
-    list,
+    workflow,
     loading,
+    createWorkflow,
     addCard,
     updateCard,
     deleteCard,
-    updateCardOrder
+    updateCardOrder,
+    updateWorkflow
   };
 }; 
